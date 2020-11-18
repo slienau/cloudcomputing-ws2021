@@ -39,7 +39,7 @@ aws ec2 attach-volume --device /dev/sda2 --instance-id $INSTANCE_ID --volume-id 
 # Get the Public DNS Name
 PUBLIC_DNS=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --output text --query "Reservations[].Instances[].PublicDnsName")
 
-# Add to known hosts
+# Add to known hosts to avoid blocking the script by the prompt
 ssh-keyscan -H $PUBLIC_DNS >> ~/.ssh/known_hosts
 
 # Install the sysbench package for Task 3
@@ -47,12 +47,11 @@ ssh -i ~/.ssh/id_rsa ubuntu@$PUBLIC_DNS 'sudo apt update && sudo apt install -y 
 
 # Copy the benchmark script
 scp -i ~/.ssh/id_rsa run_bench.sh ubuntu@$PUBLIC_DNS:/home/ubuntu
-ssh -i ~/.ssh/id_rsa ubuntu@$PUBLIC_DNS 'sudo mv /home/ubuntu/run_bench.sh /usr/local/bin'
 
 # Create the benchmark data file
 ssh -i ~/.ssh/id_rsa ubuntu@$PUBLIC_DNS 'echo "time,cpu,mem,diskRand,diskSeq" >> /home/ubuntu/aws_results.csv'
 
 # Create the crontab to be executed every 0 and 30 min marks
-ssh -i ~/.ssh/id_rsa ubuntu@$PUBLIC_DNS '(crontab -l; echo "0,30 * * * * run_bench.sh >> /home/ubuntu/aws_results.csv") | crontab -'
+ssh -i ~/.ssh/id_rsa ubuntu@$PUBLIC_DNS '(crontab -l; echo "0,30 * * * * /home/ubuntu/run_bench.sh >> /home/ubuntu/aws_results.csv") | crontab -'
 
-#TODO: Try to mount the volume or just add a line to change default volume size even tho it doesn't work
+#TODO: Test and comment the preconditions
