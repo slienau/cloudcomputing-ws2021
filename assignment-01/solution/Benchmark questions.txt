@@ -1,0 +1,29 @@
+CPU benchmark questions
+1) The CPU-Test will do calculations, based on the amount of prime numbers set (Parameter –cpu-max-prime=10000). It will go through all the numbers and check if the number is a prime, by dividing the number=x with all the numbers between 2 and sqrt(x).
+
+Resulting events/values
+
+total time: 
+It is the whole duration from start to end. It does not factor the pure calculation part with many threads.
+
+total time taken by event execution:
+This is the pure calculation part where the total time from all participated threads are added up.
+
+total number of events:
+Depending on which sysbench version is used, the total number of events can be used as an performance indicator (if execution time is limited)
+
+2) Yes,but just some small changes. 
+-----------------------------------------------------
+Memory benchmark questions:
+
+1) This test allocates a memory buffer and then does a read or write operation in the size of a pointer. This will be done until the operation type has been completed through the whole specified volume.
+
+2) I think that the virtualization itself already requires hardware resources, which will affect the memory performance in a negative way. Since throughput is on of the measured elements, the virtualization software would take some space on the memory reducing the max throughput(????)
+---------------------------------------------------
+Disk benchmark questions:
+
+1) Sysbench has two different kinds of disk benchmarking. A sequential and a random one. The sequential read and write benchmarking tests the maximum performance by reading or writing one big file (should be much bigger than the memory to prevent caching results) to/from the disk. The random read/write benchmarking does this with many small files, adding up to a total defined size, which will be randomly read/written and measured.
+
+2) related to seek
+
+General question:
