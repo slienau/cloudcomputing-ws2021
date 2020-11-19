@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Assuming the amazon access information is configured with the access key and command `aws configure`
+# Assuming a ssh-key pair is generated using ssh-keygen in ~/.ssh/id_rsa[.pub]
+
 UBUNTU_SERVER_IMAGE_ID="ami-00ddb0e5626798373"
 KEY_NAME="default-key"
 ZONE="us-east-1f"
@@ -48,10 +51,13 @@ ssh -i ~/.ssh/id_rsa ubuntu@$PUBLIC_DNS 'sudo apt update && sudo apt install -y 
 # Copy the benchmark script
 scp -i ~/.ssh/id_rsa run_bench.sh ubuntu@$PUBLIC_DNS:/home/ubuntu
 
-# Create the benchmark data file
+# Create the benchmark data file with the headers
 ssh -i ~/.ssh/id_rsa ubuntu@$PUBLIC_DNS 'echo "time,cpu,mem,diskRand,diskSeq" >> /home/ubuntu/aws_results.csv'
 
 # Create the crontab to be executed every 0 and 30 min marks
-ssh -i ~/.ssh/id_rsa ubuntu@$PUBLIC_DNS '(crontab -l; echo "0,30 * * * * /home/ubuntu/run_bench.sh >> /home/ubuntu/aws_results.csv") | crontab -'
+# The job is executed every 0th and 30th minute. The results are appended to the csv file
+ssh -i ~/.ssh/id_rsa ubuntu@$PUBLIC_DNS '(crontab -l 2>/dev/null; echo "0,30 * * * * bash /home/ubuntu/run_bench.sh >> /home/ubuntu/aws_results.csv") | crontab -'
 
-#TODO: Test and comment the preconditions
+# Shutdown the server in 49 hours to save the sweet credits
+MINUTES=$(expr 49 \* 60)
+ssh -i ~/.ssh/id_rsa ubuntu@$PUBLIC_DNS "sudo shutdown -P +$MINUTES"
