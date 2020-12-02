@@ -29,7 +29,7 @@ gcloud compute networks subnets create cc-subnet1 \
 gcloud compute networks subnets create cc-subnet2 \
     --network=cc-network2 \
     --region=europe-west1 \
-    --range=12.0.0.0/24
+    --range=10.0.1.0/24
 #IP: 10.0.1.0/24 ?
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -96,11 +96,19 @@ gcloud compute instances create "compute2" \
 
 # REMINDER: check network parameter
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-gcloud compute firewall-rules create "internal-rule" \
+gcloud compute firewall-rules create "internal-rule1" \
+    --network=cc-network1 \
     --allow=tcp,udp,icmp \
     --direction=INGRESS \
     --target-tags=$TAG \
-    --source-ranges="10.0.0.0/23"
+    --source-ranges="10.0.0.0/24"
+
+gcloud compute firewall-rules create "internal-rule2" \
+    --network=cc-network2 \
+    --allow=tcp,udp,icmp \
+    --direction=INGRESS \
+    --target-tags=$TAG \
+    --source-ranges="10.0.1.0/24"
 
 gcloud compute firewall-rules create "openstack-external-rule" \
     --network cc-network1 \
