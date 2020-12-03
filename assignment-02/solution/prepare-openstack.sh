@@ -12,7 +12,7 @@ openstack security group rule create --ingress --proto udp --remote-ip 0.0.0.0/0
 
 openstack security group rule create --ingress --proto icmp --remote-ip 0.0.0.0/0 open-all
 
-ssh-keygen -b 2048 -t rsa -f ./id_openstack -q -N "" -C
+ssh-keygen -b 2048 -t rsa -f ./id_openstack -N ""
 
 IP=$(gcloud compute instances list | grep controller | awk '{print $5}' | cut -d ',' -f 1)
 
@@ -27,5 +27,5 @@ PROJECT_ID=$(openstack project list | grep admin | awk '{print $2}')
 SECURITY_ID=$(openstack security group list --project $PROJECT_ID | grep default | awk '{print $2}')
 
 openstack server create --flavor m1.medium --image ubuntu-16.04 \
-    --network admin-net --security-group $SECURITY_ID \
-    --key-name openstack_key ins1
+        --network admin-net --security-group open-all \
+        --key-name openstack_key ins1
