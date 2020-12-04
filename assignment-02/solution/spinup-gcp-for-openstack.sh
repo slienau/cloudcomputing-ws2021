@@ -24,13 +24,11 @@ gcloud compute networks subnets create cc-subnet1 \
     --region=europe-west1 \
     --range=10.0.0.0/24 \
     --secondary-range range-1=192.0.1.0/24
-#IP: 10.0.0.0/24 ?
 
 gcloud compute networks subnets create cc-subnet2 \
     --network=cc-network2 \
     --region=europe-west1 \
     --range=10.0.1.0/24
-#IP: 10.0.1.0/24 ?
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #4. Create a disk based on an “Ubuntu Server 18.04” image in your
@@ -65,6 +63,8 @@ gcloud compute images create nested-vm-image \
 
 # The VMs must have 2 NICs (check the --network-interface parameter).
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Create the controller vm with aliases assigned to range-1 (the secondary range of the first subnet)
 gcloud compute instances create "controller" \
     --zone $ZONE_NAME \
     --image nested-vm-image \
@@ -73,6 +73,7 @@ gcloud compute instances create "controller" \
     --network-interface network=cc-network1,subnet=cc-subnet1,aliases=range-1:/24 \
     --network-interface network=cc-network2,subnet=cc-subnet2
 
+# The other 2 compute instances, identical based on the image, nothing fancy here
 gcloud compute instances create "compute1" \
     --zone $ZONE_NAME \
     --image nested-vm-image \
@@ -96,6 +97,8 @@ gcloud compute instances create "compute2" \
 
 # REMINDER: check network parameter
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# create two internal rules to assign them two the corresponding internal ip ranges of the subnet
 gcloud compute firewall-rules create "internal-rule1" \
     --network=cc-network1 \
     --allow=tcp,udp,icmp \
@@ -110,6 +113,7 @@ gcloud compute firewall-rules create "internal-rule2" \
     --target-tags=$TAG \
     --source-ranges="10.0.1.0/24"
 
+# Create one external rule to allow tcp and icmp from everywhere withing certain ports (It's all the ports for now for POC purposes)
 gcloud compute firewall-rules create "openstack-external-rule" \
     --network cc-network1 \
     --allow=tcp,icmp \
