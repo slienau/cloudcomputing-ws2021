@@ -1,0 +1,15 @@
+# Comparison of Plots  
+
+## CPU Plot  
+For the cpu plots events per second seem to be higher in this weeks case. This is most probably due to the change of machine type from e2-standart-2 to n2-standart-2
+The n2 machines have run with new generations of cpus, as stated in their definition, the n2 machines can take advantage of higher clock freq. This is why they performed better even with nested virtualization.
+
+## MEM Plot  
+The memory performance seems to be higher in the case of last exercise. This is due to the nested virtualization used in this exercise. Mapping from real memory to the openstack instance is realized in two steps in this case.
+
+## diskSeq Plot  
+The sequential disk access performance seems to be higher in the case of last exercise. This is due to the nested virtualization used in this exercise. Mapping from real storage to the openstack instance is realized in two steps in this case (GCP + OpenS).
+
+## diskRand Plot  
+Suprisingly, the random disk access performance is higher this week's exercise. We argue that it would have been even higher if it was not used with nested virtualizaiton.
+The increased disk access is most probably due to the usage of 200Gig disk in this case. Because google provides higher IO throughput with disks equal and above 200Gig.
