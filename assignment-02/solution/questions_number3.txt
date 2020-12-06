@@ -1,0 +1,38 @@
+1. Give a short overall explanation in your own words of what you did in this assignment (max. 200 words). (5 Points)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In this assignment we deployed our own cloud platform using OpenStack. Because we do not have our own hardware, we deployed OpenStack to the google cloud platform. To be able to do that, we created our custom disk image which allows nested virtualization (after we added the license to it).
+Three VM instances and appropriate firewall rules were created so that our OpenStack installation can be reached from the public internet.
+Next, OpenStack was installed on the instances using ansible (after doing some debugging because there were some issues during installation). After installing OpenStack, we were able to use the openstack-cli to execute the two provided scripts which created two OS images and two virtual networks on OpenStack. We configured openstack firewall rules to allow connections from external IPs on all tcp and udp ports, as well as icmp traffic. We created a new ssh key-pair, added it to OpenStack, and finally created a Ubuntu VM on our OpenStack instance. We can now connect to this instance using the created key.
+
+
+
+
+2. After creating all gc VMs, deploying OpenStack and starting an OpenStack VM, how many virtual networks are involved to establish the connectivity? (1 Point)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+4 virtual networks; (2 google cloud + 2 openstack (admin + external))
+
+
+
+
+
+3. Initially, the OpenStack VM was not reachable from the gc controller VM (step 11). Why? (2 Points)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Because there was no route to the OpenStack external network (10.122.0.0/24) in the routing table of the gc controller, so the instance did not know where to send the packets to.
+
+
+
+
+4. Look into the iptables-magic.sh script. What is happening there? Describe every command with 1-2 sentences. (5 Points)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The command 'docker exec openvswitch_vswitchd ip a add $floating_gateway dev br-ex' sets the IP address of the device 'br-ex' (of the Open vSwitch) to '10.122.0.1'
+
+The command 'docker exec openvswitch_vswitchd ip link set br-ex up' brings up the device 'br-ex'
+
+The command 'docker exec openvswitch_vswitchd ip link set dev br-ex mtu 1400' sets the MTU of the device 'br-ex' to 1400
+
+The command 'ip r a "$floating_subnet" via $floating_gateway dev br-ex' adds a route to the routing table of the gc controller, so that it is able to route packages to any ip of the openstack floating ip-range (10.122.0.0/24) via the gateway ip (10.122.0.1).
+
+The command 'iptables -t nat -A POSTROUTING -o ens4 -j MASQUERADE' enables a NAT router on the gc controller. The source address of all packets that leave via network device 'ens4' (openstack admin net 10.0.0.0/24) will be replaced by the ip address of the gc controller.
+
+The last two commands allow forwarding from device ens4 (openstack admin net) and device br-ex (openstack external net) and vice versa on the gc controller.
