@@ -29,15 +29,11 @@ diskRand=$(sysbench --time=$runtime --file-test-mode=rndrd --file-total-size=1G 
 
 # Run the forkbench test
 1>&2 echo "Running fork test..."
-fork=($echo "TODO: fork")
+fork=($echo "TODO:fork")
 
-# Run the forkbench test
-1>&2 echo "Running fork test..."
-fork=($echo "TODO: fork")
-
-# Run the forkbench test
+# Run the uplink test
 1>&2 echo "Running uplink test..."
-uplink=($echo "TODO: uplink")
+uplink=($echo "TODO:uplink")
 
 # Output the benchmark results as one CSV line
 echo "$time,$cpu,$mem,$diskRand,$diskSeq,$fork,$uplink"
