@@ -1,4 +1,12 @@
 #!/bin/bash
+
+if [ "$1" != "" ]; then
+    echo "Provide host IP address as the first parameter. $(hostname -i)"
+    exit 1
+fi
+
+host_ip=$1
+
 # This script benchmarks CPU, memory and random/sequential disk access.
 # Some debug output is written to stderr, and the final benchmark result is output on stdout as a single CSV-formatted line.
 
@@ -33,7 +41,7 @@ fork=($echo "TODO:fork")
 
 # Run the uplink test
 1>&2 echo "Running uplink test..."
-uplink=($echo "TODO:uplink")
+uplink=$(iperf3 -4 -P 5 -f m -t $runtime -c $host_ip | tail -3 | head -1 | awk '{print $6}')
 
 # Output the benchmark results as one CSV line
 echo "$time,$cpu,$mem,$diskRand,$diskSeq,$fork,$uplink"
