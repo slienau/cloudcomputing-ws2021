@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$1" != "" ]; then
+if [ "$1" == "" ]; then
     echo "Provide host IP address as the first parameter. $(hostname -i)"
     exit 1
 fi
