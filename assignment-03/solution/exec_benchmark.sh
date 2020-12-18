@@ -6,21 +6,23 @@ touch native-results.csv docker-results.csv kvm-results.csv qemu-results.csv
 # Write headers for the result files
 echo "time,cpu,mem,diskRand,diskSeq,fork,uplink" | tee *.csv
 
+ITERS=10
+
 # Start the iperf server in the host machine
 iperf3 -s -D
 
 # TODO: Comments
 
-IP_HOST=$(hostname -I | cut -d ' ' -f1)
+IP_HOST=$(hostname -i)
 
-for i in {1..10}
+for ((i=1; i<=$ITERS; i++))
 do
     bash benchmark.sh $IP_HOST >> native-results.csv
 done
 
 docker build -t cc-docker .
 
-for i in {1..10}
+for ((i=1; i<=$ITERS; i++))
 do
     docker run cc-docker bash /app/benchmark.sh $IP_HOST >> docker-results.csv
 done
@@ -28,21 +30,22 @@ done
 IP_KVM=$(sudo virsh domifaddr instance-1 | grep vnet | awk '{print $4}' | cut -d '/' -f 1)
 IP_QEMU=$(sudo virsh domifaddr instance-2 | grep vnet | awk '{print $4}' | cut -d '/' -f 1)
 
-ssh ubuntu@$IP_QEMU 'mkdir /app'
-ssh ubuntu@$IP_KVM 'mkdir /app'
 
-scp benchmark.sh ubuntu@$IP_QEMU:/app/
-scp benchmark.sh ubuntu@$IP_KVM:/app/
+ssh-keyscan -H $IP_KVM >> ~/.ssh/known_hosts
+ssh-keyscan -H $IP_QEMU >> ~/.ssh/known_hosts
+
+scp benchmark.sh ubuntu@$IP_QEMU:
+scp benchmark.sh ubuntu@$IP_KVM:
 
 ssh ubuntu@$IP_QEMU 'sudo apt-get update && sudo apt-get install -y iperf3 sysbench'
 ssh ubuntu@$IP_KVM 'sudo apt-get update && sudo apt-get install -y iperf3 sysbench'
 
-for i in {1..10}
+for ((i=1; i<=$ITERS; i++))
 do
-    ssh ubuntu@$IP_KVM 'bash /app/benchmark.sh $IP_HOST' >> kvm-results.csv
+    ssh ubuntu@$IP_KVM "bash benchmark.sh $IP_HOST" >> kvm-results.csv
 done
 
-for i in {1..10}
+for ((i=1; i<=$ITERS; i++))
 do
-    ssh ubuntu@$IP_QEMU 'bash /app/benchmark.sh $IP_HOST' >> qemu-results.csv
+    ssh ubuntu@$IP_QEMU "bash benchmark.sh $IP_HOST" >> qemu-results.csv
 done
