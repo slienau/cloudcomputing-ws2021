@@ -20,53 +20,32 @@ int parseInt(char *str, char *errMsg);
 // the other side is used by the child process to output results.
 int spawnChild(int start, int end) {
 	
-	// fileDescChild[0] is set up for reading, fileDescChild[1] is set up for writing
 	int fd[2];
-
-	// initialize a pipe
-	if (pipe(fd) == -1) 
-    { 
-        fprintf(stderr, "Pipe initialization error"); 
-        return -1; 
-    }
-
-	// create child processes
-	pid_t child;
-
-	// make an attempt to create a new process
-	// from this moment on, there is a need to distinguish between a parent and a child process
-	// fork() returns zero to the newly created child process, and it returns PROCESS_ID to the parent
-	// fork() < 0 indicates that there was an error during the creation of a process
- 	
-	child = fork();
-	if (child < 0)
-	{
-		fprintf(stderr, "The creation of a new process failed."); 
-		return -1:
-	}
-
-	// the parent should receive the exit of the pipe
-
-	// the parent of the child
-	if (child > 0) 
-	{
-		close(fd[1]);
-		return fd[0];
-	} 
-	// the entrance of the pipe should be transformed to the child
-	else
-	{
-		
-	}
 	
-	return 0;
+	if (pipe(fd) == -1){
+		//fprinf(stderr, "Pipe Failed");
+		return 1;
+	}
+	int pid = fork();
+	
+	if (pid <= 0){
+		Result result = forkbench(start, end);
+		write(fd[1], &result, sizeof(Result));
+		close(fd[1]);
+		exit(0);
+	}
+	return fd[0];
 }
 
 // readChild reads data from the given file descriptor and parses it to a Result struct.
 // This reads the result data written by a child process in spawnChild().
 Result readChild(int fd) {
 		
-	return (Result) {0, 0};
+	Result retrieved;
+	wait(NULL);
+	read(fd, &retrieved, sizeof(Result));
+	close(fd);
+	return retrieved;
 }
 
 // forkbench computes the sum of all numbers in the given range (inclusive) by spawning 2 child processes.
