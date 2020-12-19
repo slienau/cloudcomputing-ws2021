@@ -37,7 +37,41 @@ diskRand=$(sysbench --time=$runtime --file-test-mode=rndrd --file-total-size=1G 
 
 # Run the forkbench test
 1>&2 echo "Running fork test..."
-fork=($echo "TODO:fork")
+
+# Create an empty array to store forkspersec per test
+vallist=()
+
+# Time the start
+start=$SECONDS
+
+# Execute until duration has passed, discard the last test, (might as well keep it)
+while true
+do 
+    forkspersec=$(forkbench 0 3000 2> /dev/null)
+    if [[ $((SECONDS - start)) -gt $runtime ]]
+    then
+        break
+    fi
+    vallist+=($forkspersec)
+done
+
+# Create an expression for calculating the mean with 2 decimal points
+expression="scale=2;("
+
+# Add all values
+for val in "${vallist[@]}"
+do  
+    expression+="$val+"
+done
+
+expression=${expression::-1}
+expression+=")/"
+
+# Divide by the number of tests
+expression+="${#vallist[@]}"
+
+#Evaluate the expression
+fork=$(echo $expression | bc -l)
 
 # Run the uplink test
 1>&2 echo "Running uplink test..."
