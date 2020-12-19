@@ -20,18 +20,31 @@ int parseInt(char *str, char *errMsg);
 // the other side is used by the child process to output results.
 int spawnChild(int start, int end) {
 	
-	// TODO Implement me
-
-	return 0;
+	int fd[2];
+	
+	if (pipe(fd) == -1){
+		//fprinf(stderr, "Pipe Failed");
+		return 1;
+	}
+	int pid = fork();
+	
+	if (pid <= 0){
+		Result result = forkbench(start, end);
+		write(fd[1], &result, sizeof(Result));
+		close(fd[1]);
+		exit(0);
+	}
+	return fd[0];
 }
 
 // readChild reads data from the given file descriptor and parses it to a Result struct.
 // This reads the result data written by a child process in spawnChild().
 Result readChild(int fd) {
 		
-	// TOD Implement me
-
-	return (Result) {0, 0};
+	Result retrieved;
+	read(fd, &retrieved, sizeof(Result));
+	close(fd);
+	return retrieved;
 }
 
 // forkbench computes the sum of all numbers in the given range (inclusive) by spawning 2 child processes.
