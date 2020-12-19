@@ -1,0 +1,25 @@
+As experiment host, we used a VM in the google cloud with an ubuntu 18.04 image.
+
+To install QEMU with KVM we followed the guide on https://medium.com/@art.vasilyev/use-ubuntu-cloud-image-with-kvm-1f28c19f82f8. After the QEMU installation we donwload an ubuntu cloud image. With this image, we create a VM-image and set the cloud-init configuration (create meta- and user-data like localhost and public key), so that the machine will be accesible later. We did this for two different virtual machines, where one machine only includes QEMU, while the other includes Qemu with KVM. After these configurations, we are able to connect to the machine via ssh.
+
+QEMU emulator version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.34)
+
+Installed docker in ubuntu the installation guide from docker. After the installation we added our user to the docker group, so that we don't have to call docker with sudo rights.
+
+Docker version: 20.10.1, build 831ebea
+
+Experiment Host Hardware specs:
+CPU: 4 processors 
+for each processor:
+model name	: Intel(R) Xeon(R) CPU
+cpu cores	: 2
+cpu MHz		: 2800.224
+cache size	: 33792 KB
+
+RAM:
+Size: 16384 MB
+Type Detail: Synchronous
+
+Disk:
+size: 200GiB (214GB)
+product: PersistentDisk
