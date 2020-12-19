@@ -39,7 +39,7 @@ int spawnChild(int start, int end) {
 	// fork() < 0 indicates that there was an error during the creation of a process
  	
 	child = fork();
-	if (leftChild < 0)
+	if (child < 0)
 	{
 		fprintf(stderr, "The creation of a new process failed."); 
 		return -1:
@@ -48,11 +48,9 @@ int spawnChild(int start, int end) {
 	// the parent should receive the exit of the pipe
 
 	// the parent of the child
-	if (leftChild > 0) 
+	if (child > 0) 
 	{
 		close(fd[1]);
-		int status;
-		waitpid(child, &status, 0);
 		return fd[0];
 	} 
 	// the entrance of the pipe should be transformed to the child
