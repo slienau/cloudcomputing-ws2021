@@ -20,8 +20,47 @@ int parseInt(char *str, char *errMsg);
 // the other side is used by the child process to output results.
 int spawnChild(int start, int end) {
 	
-	// TODO Implement me
+	// fileDescChild[0] is set up for reading, fileDescChild[1] is set up for writing
+	int fd[2];
 
+	// initialize a pipe
+	if (pipe(fd) == -1) 
+    { 
+        fprintf(stderr, "Pipe initialization error"); 
+        return -1; 
+    }
+
+	// create child processes
+	pid_t child;
+
+	// make an attempt to create a new process
+	// from this moment on, there is a need to distinguish between a parent and a child process
+	// fork() returns zero to the newly created child process, and it returns PROCESS_ID to the parent
+	// fork() < 0 indicates that there was an error during the creation of a process
+ 	
+	child = fork();
+	if (leftChild < 0)
+	{
+		fprintf(stderr, "The creation of a new process failed."); 
+		return -1:
+	}
+
+	// the parent should receive the exit of the pipe
+
+	// the parent of the child
+	if (leftChild > 0) 
+	{
+		close(fd[1]);
+		int status;
+		waitpid(child, &status, 0);
+		return fd[0];
+	} 
+	// the entrance of the pipe should be transformed to the child
+	else
+	{
+		
+	}
+	
 	return 0;
 }
 
@@ -29,8 +68,6 @@ int spawnChild(int start, int end) {
 // This reads the result data written by a child process in spawnChild().
 Result readChild(int fd) {
 		
-	// TOD Implement me
-
 	return (Result) {0, 0};
 }
 
