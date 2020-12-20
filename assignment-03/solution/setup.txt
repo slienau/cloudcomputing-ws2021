@@ -1,4 +1,4 @@
-As experiment host, we used a VM in the google cloud with an ubuntu 18.04 image.
+As experiment host, we used a VM in the google cloud with an ubuntu 18.04 image and a n2 standard 4 as machine type.
 
 To install QEMU with KVM we followed the guide on https://medium.com/@art.vasilyev/use-ubuntu-cloud-image-with-kvm-1f28c19f82f8. After the QEMU installation we donwload an ubuntu cloud image. With this image, we create a VM-image and set the cloud-init configuration (create meta- and user-data like localhost and public key), so that the machine will be accesible later. We did this for two different virtual machines, where one machine only includes QEMU, while the other includes Qemu with KVM. After these configurations, we are able to connect to the machine via ssh.
 
