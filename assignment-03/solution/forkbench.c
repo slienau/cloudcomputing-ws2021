@@ -23,16 +23,24 @@ int spawnChild(int start, int end) {
 	int fd[2];
 	
 	if (pipe(fd) == -1){
-		//fprinf(stderr, "Pipe Failed");
+		fprintf(stderr, "Pipe Failed\n");
 		return 1;
 	}
 	int pid = fork();
 	
-	if (pid <= 0){
+	while (pid < 0){
+		fprintf(stderr, "Fork Failed & Retrying in 0.5 second\n");
+		sleep(0.5);
+		pid = fork();
+	}
+
+	if (pid == 0){
 		Result result = forkbench(start, end);
 		write(fd[1], &result, sizeof(Result));
 		close(fd[1]);
 		exit(0);
+	}else if (pid < 0){
+		fprintf(stderr, "amcam");
 	}
 	return fd[0];
 }
