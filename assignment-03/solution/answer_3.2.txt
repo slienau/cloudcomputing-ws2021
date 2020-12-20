@@ -1,0 +1,10 @@
+Looking at the results shows that the QEMU guest system (without KVM) has the highest uplink deviation compared to the native execution.
+
+We run the uplink benchmark against the public iperf3 server `bouygues.iperf.fr` using the command `iperf3 -4 -P 5 -f m -t 60 -c bouygues.iperf.fr -p 9214`
+
+The result from the native system was 6756 Mbits/sec.
+The result from the QEMU guest system was 2277 Mbits/sec.
+
+The result from the QEMU guest against the public iperf3 server (2277 Mbits/sec) is about the same as against the iperf3 server hosted on the experiment host directly. We assume that the network device simulated by QEMU is the bottleneck here, as the uplink result from the native system aginst the public iperf3 server is higher than that (6756 Mbits/sec), so we assume that 6756 Mbits/sec is the internet uplink speed of our VM running in the Google Cloud Platform.
+
+-> The results could be reproduced because QEMU simulates the network device, which is slower (software emulation) than the actual native hardware network device.
