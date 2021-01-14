@@ -1,0 +1,10 @@
+# kubectl cluster-info
+Kubernetes master is running at https://10.0.0.2:6443
+
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+
+# kubectl get node
+NAME    STATUS   ROLES    AGE   VERSION
+node1   Ready    master   18m   v1.18.10
+node2   Ready    master   16m   v1.18.10
+node3   Ready    master   16m   v1.18.10

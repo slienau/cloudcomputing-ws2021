@@ -1,0 +1,90 @@
+#- hosts: all
+#  tasks:
+#    - name: Install openshift
+#      pip:
+#        name: openshift
+
+- hosts: node1
+  tasks:
+    - name: Create a k8s namespace
+      k8s:
+        name: cc-k8s
+        api_version: v1
+        kind: Namespace
+        state: present
+    - name: Deploy Fronted
+      k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Deployment
+          metadata:
+            namespace: cc-k8s
+            name: frontend-site
+            labels:
+              app: web
+          spec:
+            replicas: 4
+            selector:
+              matchLabels:
+                app: web
+            template:
+              metadata:
+                labels:
+                  app: web
+              spec:
+                containers:
+                  - name: frontend
+                    image: dsl89/cloudcomputing-ws2021:frontend
+                    ports:
+                      - containerPort: 80
+                    readinessProbe:
+                      tcpSocket:
+                        port: 80
+                        path: /ready
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    livenessProbe:
+                      tcpSocket:
+                        port: 80
+                        path: /ready
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+    - name: Deploy Backend
+      k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Deployment
+          metadata:
+            namespace: cc-k8s
+            name: backend-site
+            labels:
+              app: web
+          spec:
+            replicas: 6
+            selector:
+              matchLabels:
+                app: web
+            template:
+              metadata:
+                labels:
+                  app: web
+              spec:
+                containers:
+                  - name: backend
+                    image: dsl89/cloudcomputing-ws2021:backend
+                    ports:
+                      - containerPort: 80
+                    readinessProbe:
+                      tcpSocket:
+                        port: 80
+                        path: /ready
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    livenessProbe:
+                      tcpSocket:
+                        port: 80
+                        path: /ready
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
