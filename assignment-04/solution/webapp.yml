@@ -22,19 +22,23 @@
             namespace: cc-k8s
             name: frontend-site
             labels:
-              app: web
+              app: cc-app
           spec:
             replicas: 4
             selector:
               matchLabels:
-                app: web
+                app: cc-app
+                tier: frontend
+                track: stable
             template:
               metadata:
                 labels:
-                  app: web
+                  app: cc-app
+                  tier: frontend
+                  track: stable
               spec:
                 containers:
-                  - name: frontend
+                  - name: frontend-image
                     image: dsl89/cloudcomputing-ws2021:frontend
                     ports:
                       - containerPort: 80
@@ -60,19 +64,23 @@
             namespace: cc-k8s
             name: backend-site
             labels:
-              app: web
+              app: cc-app
           spec:
             replicas: 6
             selector:
               matchLabels:
-                app: web
+                app: cc-app
+                tier: backend
+                track: stable
             template:
               metadata:
                 labels:
-                  app: web
+                  app: cc-app
+                  tier: backend
+                  track: stable
               spec:
                 containers:
-                  - name: backend
+                  - name: cc-app
                     image: dsl89/cloudcomputing-ws2021:backend
                     ports:
                       - containerPort: 80
@@ -88,3 +96,41 @@
                         path: /ready
                       initialDelaySeconds: 15
                       periodSeconds: 20
+    - name: Frontend Service
+      k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            namespace: cc-k8s
+            name: cc-frontend-service
+          spec:
+            selector:
+              app: cc-app
+              tier: frontend
+            ports:
+              - protocol: "TCP"
+                port: 80
+                targetPort: 80
+            externalIPs:
+              - 34.76.137.104
+            type: NodePort
+    - name: Backend Service
+      k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            namespace: cc-k8s
+            name: cc-backend-service
+          spec:
+            selector:
+              app: cc-app
+              tier: backend
+            ports:
+              - protocol: "TCP"
+                port: 80
+                targetPort: 80
+            type: ClusterIP
