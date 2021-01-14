@@ -1,0 +1,8 @@
+# build and tag frontend
+docker build -t dsl89/cloudcomputing-ws2021:frontend -f frontend.Dockerfile .
+
+# build and tag backend
+docker build -t dsl89/cloudcomputing-ws2021:backend -f backend.Dockerfile .
+
+# push to docker
+docker push dsl89/cloudcomputing-ws2021:frontend && docker push dsl89/cloudcomputing-ws2021:backend
