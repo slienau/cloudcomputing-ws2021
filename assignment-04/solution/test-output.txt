@@ -1,0 +1,42 @@
+# The command used to execute the test
+# python test-deployment.py 34.76.137.104:32180 35.240.88.48:32180 104.199.96.39:32180
+
+Sending 100 requests to 34.76.137.104:32180...
+Sending 100 requests to 35.240.88.48:32180...
+Sending 100 requests to 104.199.96.39:32180...
+
+Encountered 4 frontends:
+frontend-site-77dd46879d-vdp6q
+frontend-site-77dd46879d-rrvlv
+frontend-site-77dd46879d-p5wvt
+frontend-site-77dd46879d-fv42l
+
+Encountered 6 backends:
+backend-site-6c948f56cb-4vh57
+backend-site-6c948f56cb-gcrn8
+backend-site-6c948f56cb-vxrmm
+backend-site-6c948f56cb-89xck
+backend-site-6c948f56cb-cj8h5
+backend-site-6c948f56cb-x4dw2
+
+Encountered 18 reply texts:
+Hello! You are 10.233.90.23 and requested /etc/nginx/html/ from 10.233.92.14 (backend-site-6c948f56cb-cj8h5)
+Hello! You are 10.233.90.23 and requested /etc/nginx/html/ from 10.233.92.15 (backend-site-6c948f56cb-x4dw2)
+Hello! You are 10.233.90.23 and requested /etc/nginx/html/ from 10.233.96.15 (backend-site-6c948f56cb-vxrmm)
+Hello! You are 10.233.90.24 and requested /etc/nginx/html/ from 10.233.90.17 (backend-site-6c948f56cb-4vh57)
+Hello! You are 10.233.90.24 and requested /etc/nginx/html/ from 10.233.90.18 (backend-site-6c948f56cb-gcrn8)
+Hello! You are 10.233.90.24 and requested /etc/nginx/html/ from 10.233.96.16 (backend-site-6c948f56cb-89xck)
+Hello! You are 10.233.92.19 and requested /etc/nginx/html/ from 10.233.90.17 (backend-site-6c948f56cb-4vh57)
+Hello! You are 10.233.92.19 and requested /etc/nginx/html/ from 10.233.90.18 (backend-site-6c948f56cb-gcrn8)
+Hello! You are 10.233.92.19 and requested /etc/nginx/html/ from 10.233.92.14 (backend-site-6c948f56cb-cj8h5)
+Hello! You are 10.233.92.19 and requested /etc/nginx/html/ from 10.233.92.15 (backend-site-6c948f56cb-x4dw2)
+Hello! You are 10.233.92.19 and requested /etc/nginx/html/ from 10.233.96.15 (backend-site-6c948f56cb-vxrmm)
+Hello! You are 10.233.92.19 and requested /etc/nginx/html/ from 10.233.96.16 (backend-site-6c948f56cb-89xck)
+Hello! You are 10.233.96.19 and requested /etc/nginx/html/ from 10.233.90.17 (backend-site-6c948f56cb-4vh57)
+Hello! You are 10.233.96.19 and requested /etc/nginx/html/ from 10.233.90.18 (backend-site-6c948f56cb-gcrn8)
+Hello! You are 10.233.96.19 and requested /etc/nginx/html/ from 10.233.92.14 (backend-site-6c948f56cb-cj8h5)
+Hello! You are 10.233.96.19 and requested /etc/nginx/html/ from 10.233.92.15 (backend-site-6c948f56cb-x4dw2)
+Hello! You are 10.233.96.19 and requested /etc/nginx/html/ from 10.233.96.15 (backend-site-6c948f56cb-vxrmm)
+Hello! You are 10.233.96.19 and requested /etc/nginx/html/ from 10.233.96.16 (backend-site-6c948f56cb-89xck)
+
+All tests passed.
