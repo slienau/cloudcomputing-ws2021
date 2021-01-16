@@ -6,3 +6,14 @@ docker build -t dsl89/cloudcomputing-ws2021:backend -f backend.Dockerfile .
 
 # push to docker
 docker push dsl89/cloudcomputing-ws2021:frontend && docker push dsl89/cloudcomputing-ws2021:backend
+
+# k8s deploy all the pods, the openshift installation is commented out in the same file
+# Executes the taks defined in webapp.yml with the hosts in hosts.yml and with the root user in target node1
+ansible-playbook -i hosts.yml --become --become-user=root webapp.yml
+
+# Get the information about cc-frontend-service with the namespace cc-k8s
+# Parse the bound port to the service
+kubectl get service cc-frontend-service -n cc-k8s | grep frontend | awk '{print $5}' | cut -d ':' -f2 | cut -d '/' -f1
+
+# The command used to execute the test with hosts ips of VMs from gcp
+python test-deployment.py 34.76.137.104:32180 35.240.88.48:32180 104.199.96.39:32180
