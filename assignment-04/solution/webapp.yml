@@ -113,8 +113,6 @@
               - protocol: "TCP"
                 port: 80
                 targetPort: 80
-            externalIPs:
-              - 34.76.137.104
             type: NodePort
     - name: Backend Service
       k8s:
