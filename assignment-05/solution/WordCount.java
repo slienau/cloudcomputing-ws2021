@@ -124,7 +124,7 @@ public class WordCount {
                     if (!token.matches("[a-z]+$")) {
                         continue;
                     }
-                    // out.collect(new Tuple2<>(token, 1));
+                    out.collect(new Tuple2<>(token, 1));
                 }
             }
         }
