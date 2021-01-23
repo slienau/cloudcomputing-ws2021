@@ -17,16 +17,30 @@
 
 package org.apache.flink.streaming.examples.wordcount;
 
+import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.MultipleParameterTool;
+import org.apache.flink.streaming.api.datastream.AllWindowedStream;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.ProcessFunction;
+import org.apache.flink.streaming.api.functions.windowing.AllWindowFunction;
+import org.apache.flink.streaming.api.functions.windowing.ProcessAllWindowFunction;
+import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
+import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.EventTimeSessionWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
+import org.apache.flink.streaming.examples.statemachine.event.Event;
 import org.apache.flink.streaming.examples.wordcount.util.WordCountData;
 import org.apache.flink.util.Collector;
 import org.apache.flink.util.Preconditions;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Implements the "WordCount" program that computes a simple word occurrence histogram over text
@@ -81,17 +95,19 @@ public class WordCount {
             text = env.fromElements(WordCountData.WORDS);
         }
 
-        DataStream<Tuple2<String, Integer>> counts =
+        DataStream<Tuple2<String,Integer>> counts =
                 // split up the lines in pairs (2-tuples) containing: (word,1)
                 text.flatMap(new Tokenizer())
-                        // group by the tuple field "0" and sum up tuple field "1"
                         .keyBy(value -> value.f0)
                         .window(EventTimeSessionWindows.withGap(Time.seconds(5)))
-                        .sum(1);
+                        .sum(1)
+                        .keyBy(value -> "a") // Trick to gather all elements in one key to sort
+                        .window(EventTimeSessionWindows.withGap(Time.seconds(5)))
+                        .apply(new Sorter());
 
-        // emit result
+                 // emit result
         if (params.has("output")) {
-            counts.writeAsText(params.get("output"));
+            counts.writeAsCsv(params.get("output"));
         } else {
             System.out.println("Printing result to stdout. Use --output to specify output path.");
             counts.print();
@@ -109,6 +125,25 @@ public class WordCount {
      * FlatMapFunction. The function takes a line (String) and splits it into multiple pairs in the
      * form of "(word,1)" ({@code Tuple2<String, Integer>}).
      */
+
+
+    public static final class Sorter
+            implements WindowFunction<Tuple2<String, Integer>, Tuple2<String, Integer>, String, TimeWindow> {
+
+        @Override
+        public void apply(String s, TimeWindow window, Iterable<Tuple2<String, Integer>> input, Collector<Tuple2<String, Integer>> out) throws Exception {
+            List<Tuple2<String, Integer>> target = new ArrayList<>();
+            input.forEach(target::add);
+            target.sort(new Comparator<Tuple2<String, Integer>>() {
+                @Override
+                public int compare(Tuple2<String, Integer> t1, Tuple2<String, Integer> t2) {
+                    return t2.f1 - t1.f1;
+                }
+            });
+            target.forEach(out::collect);
+        }
+    }
+
     public static final class Tokenizer
             implements FlatMapFunction<String, Tuple2<String, Integer>> {
 
@@ -119,14 +154,11 @@ public class WordCount {
 
             // emit the pairs
             for (String token : tokens) {
-                if (token.length() > 0) {
-                    // filter non-alphabetical values
-                    if (!token.matches("[a-z]+$")) {
-                        continue;
-                    }
+                if (token.length() > 0 && token.matches("[a-z]+$")) {
                     out.collect(new Tuple2<>(token, 1));
                 }
             }
         }
     }
+
 }
