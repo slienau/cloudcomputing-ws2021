@@ -101,7 +101,7 @@ public class WordCount {
                         .keyBy(value -> value.f0)
                         .window(EventTimeSessionWindows.withGap(Time.seconds(5)))
                         .sum(1)
-                        .keyBy(value -> "a") // Trick to gather all elements in one key to sort
+                        .keyBy(value -> "a")
                         .window(EventTimeSessionWindows.withGap(Time.seconds(5)))
                         .apply(new Sorter());
 
@@ -150,11 +150,11 @@ public class WordCount {
         @Override
         public void flatMap(String value, Collector<Tuple2<String, Integer>> out) {
             // normalize and split the line
-            String[] tokens = value.toLowerCase().split("\\W+");
+            String[] tokens = value.toLowerCase().split("[^a-z]+");
 
             // emit the pairs
             for (String token : tokens) {
-                if (token.length() > 0 && token.matches("[a-z]+$")) {
+                if (token.length() > 0) {
                     out.collect(new Tuple2<>(token, 1));
                 }
             }
