@@ -62,4 +62,4 @@ curl -i -X PUT -T tolstoy-war-and-peace.txt "http://localhost:8088/webhdfs/v1/da
 # In target1 flink dir:
 IP=$(hostname -i)
 # Execute job
-./bin/flink run -m $IP:8081 ./WordCount.jar --input  hdfs://$IP:50075/datas/input.txt --output hdfs://$$IP:50075/datas/out.csv
+./bin/flink run -m $IP:8081 ./WordCount.jar --input  hdfs://$IP:50075/datas/input.txt --output hdfs://$$IP:50075/datas/out.txt
