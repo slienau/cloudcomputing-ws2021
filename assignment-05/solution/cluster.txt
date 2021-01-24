@@ -1,0 +1,65 @@
+### Prerequisites
+- We installed kubernetes and it's dependencies using ansible commands documented in assignment 4
+- All the ports of the targets were exposed
+
+### Flink preparation
+### The deployment, config and service files were downloaded from the links given in task definion
+
+kubectl create -f flink-configuration-configmap.yaml
+kubectl create -f jobmanager-service.yaml
+
+kubectl create -f jobmanager-session-deployment.yaml
+kubectl create -f taskmanager-session-deployment.yaml
+
+# Get the jobmanager pod identifier
+jobmanager-pod=$(kubectl get pods | grep jobmanager | awk '{print $1}')
+# Port Forwarding
+kubectl port-forward $jobmanager-pod 8081:808
+
+### Hadoop preparation
+### The tutorial from the link in the task description was followed, but prior to that cpu limit was increased to handle insufficient CPU error
+
+## cpu.yaml
+#apiVersion: v1
+#kind: LimitRange
+#metadata:
+#  name: cpu-limit-range
+#spec:
+#  limits:
+#  - default:
+#      cpu: 2
+#    defaultRequest:
+#      cpu: 2
+#    type: Container
+
+kubectl apply -f cpu.yaml --n default
+
+# helm installiation was done as in the tutorial
+# Afterwards:
+helm install \
+    --set yarn.nodeManager.resources.limits.memory=4096Mi \
+    --set yarn.nodeManager.replicas=1 \
+    stable/hadoop --generate-name
+
+# Now hadoop is ready and we compile the WordCount.java from our local by using:
+mvn package .
+# the jar is copied to the server by scp
+scp WordCount.jar ubuntu@$target1:
+
+# We couldn't figure the rest out because we had some issues with our hadoop pods, but the following commands should be executed to complete the project:
+
+# Port forwarding for hadoop api and data node
+kubectl get pods | grep yarn-rm | awk '{print $1}' | xargs -i kubectl port-forward -n default {} 8088:8088
+kubectl get pods | grep hdfs-dn | awk '{print $1}' | xargs -i kubectl port-forward -n default {} 50075:50075
+50075 Make a directory for files
+curl -i -X PUT "http://localhost:8088/datas/?op=MKDIRS
+
+# Put the tolstoy.txt file there
+curl -i -X PUT "http://localhost:8088/webhdfs/v1/datas/input.txt?op=CREATE
+
+curl -i -X PUT -T tolstoy-war-and-peace.txt "http://localhost:8088/webhdfs/v1/datas/input.txt?op=CREATE..."
+
+# In target1 flink dir:
+IP=$(hostname -i)
+# Execute job
+./bin/flink run -m $IP:8081 ./WordCount.jar --input  hdfs://$IP:50075/datas/input.txt --output hdfs://$$IP:50075/datas/out.csv
