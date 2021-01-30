@@ -1,0 +1,9 @@
+Which steps in your program require communication and synchronization between your workers?
+Since we wern't able to setup the different worker nodes, and based on our Code, we would conclude, that synchronization of the worker nodes is needed when grouping the data with keyBy to group them alltogether while also applying the sort function afterwards on the whole data.
+
+What resources is the job bound by? Memory? CPU? Network? Disk?
+
+Since we couldn't setup many worker nodes, we assume that the resources should be most bounded by the network since it needs to read all the data that is transferred. But by running it only locally, it should be more bounded on the CPU and memory to execute the tasks.
+
+Could you improve the partitioning of your data to yield better run-time?
+I don't think so since since partitioning the data would mean, that we need to communicate with different worker nodes. That is why we assume, that the performance wouldn't increase due to resources being network bounded.
